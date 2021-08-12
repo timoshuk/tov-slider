@@ -1,6 +1,6 @@
 var gulp = require("gulp");
-var sass = require("gulp-sass"); //Sass to css
-sass.compiler = require('node-sass');
+// var sass = require("gulp-sass"); //Sass to css
+var sass = require("gulp-sass")(require("sass"));
 var useref = require("gulp-useref"); // combine js, css files
 var browserSync = require("browser-sync").create(); //browser-sync reload browser
 var uglify = require("gulp-uglify");
@@ -27,7 +27,7 @@ var paths = {
   scripts: ["app/scripts/**/*.js"],
   image: ["app/images/**/*.+(png|jpg|jpeg|gif|svg|JPG)"],
   fonts: ["app/fonts/**/*"],
-  video: ["app/video/**/*"]
+  video: ["app/video/**/*"],
 };
 
 //Tasks
@@ -39,7 +39,7 @@ gulp.task("html", function () {
     .pipe(plumber())
     .pipe(
       browserSync.reload({
-        stream: true
+        stream: true,
       })
     );
 }); //Html task
@@ -56,7 +56,7 @@ gulp.task("css", function () {
     .pipe(notify("Done!"))
     .pipe(
       browserSync.reload({
-        stream: true
+        stream: true,
       })
     );
 }); //Sass to css task
@@ -68,13 +68,13 @@ gulp.task("js", function () {
     .pipe(plumber())
     .pipe(
       babel({
-        presets: ["@babel/env"]
+        presets: ["@babel/env"],
       })
     )
     .pipe(gulp.dest("app/js"))
     .pipe(
       browserSync.reload({
-        stream: true
+        stream: true,
       })
     );
 });
@@ -97,17 +97,16 @@ gulp.task("images", function () {
       .src(paths.image)
       // Caching images that ran through imagemin
       .pipe(
-        cache(imagemin([
-          imagemin.gifsicle({ interlaced: true }),
-          imagemin.mozjpeg({ quality: 75, progressive: true }),
-          imagemin.optipng({ optimizationLevel: 5 }),
-          imagemin.svgo({
-            plugins: [
-              { removeViewBox: true },
-              { cleanupIDs: false }
-            ]
-          })
-        ]))
+        cache(
+          imagemin([
+            imagemin.gifsicle({ interlaced: true }),
+            imagemin.mozjpeg({ progressive: true }),
+            imagemin.optipng({ optimizationLevel: 5 }),
+            imagemin.svgo({
+              plugins: [{ removeViewBox: true }, { cleanupIDs: false }],
+            }),
+          ])
+        )
       )
       .pipe(gulp.dest("dist/images"))
   );
@@ -118,7 +117,7 @@ gulp.task("webp", function () {
     .src("app/images/**/*.{png,jpg}")
     .pipe(
       webp({
-        quality: 90
+        quality: 90,
       })
     )
     .pipe(gulp.dest("dist/images"));
@@ -129,7 +128,7 @@ gulp.task("sprite", function () {
     .src("app/images/icon-*.svg")
     .pipe(
       svgstore({
-        inlineSvg: true
+        inlineSvg: true,
       })
     )
     .pipe(rename("sprite.svg"))
@@ -151,11 +150,11 @@ gulp.task("clean:dist", function () {
 gulp.task("browserSync", function () {
   browserSync.init({
     server: {
-      baseDir: "app"
+      baseDir: "app",
     },
     port: 8080,
     open: true,
-    notify: false
+    notify: false,
   });
 }); //browserSync
 
@@ -164,7 +163,7 @@ gulp.task("minhtml", function () {
     .src("dist/**/*.html")
     .pipe(
       htmlmin({
-        collapseWhitespace: true
+        collapseWhitespace: true,
       })
     )
     .pipe(gulp.dest("dist"));
